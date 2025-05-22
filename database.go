@@ -10,7 +10,7 @@ import (
 
 func UpdateTimeScaleDb(vitals *Vitals, price *HourlyPrice) {
 	ctx := context.Background()
-	connStr := os.Getenv("TIMESCALE_DB_URI") //"postgresql://mananpatel@/postgres?host=/tmp"
+	connStr := os.Getenv("TIMESCALE_DB_URI")
 	conn, err := pgx.Connect(ctx, connStr)
 	if err != nil {
 		fmt.Printf("Unable to connect to database: %v\n", err)
@@ -27,13 +27,12 @@ func UpdateTimeScaleDb(vitals *Vitals, price *HourlyPrice) {
 		fmt.Printf("SELECT Error: %s\n", err)
 		return
 	}
-	fmt.Printf("Previous Wh: %f\n", prevWh)
 
 	whInLastHour := max(vitals.SessionEnergyWh-prevWh, 0)
 
 	// Insert the new wh reading
 	insertQuery := `INSERT INTO charging_stats (time, wh, price, cost) VALUES ($1, $2, $3, $4)`
-	_, err = conn.Exec(ctx, insertQuery, time.Now(), whInLastHour, price.Price, whInLastHour*price.Price)
+	_, err = conn.Exec(ctx, insertQuery, time.Now(), whInLastHour, price.Price, (whInLastHour/1000)*(price.Price/100))
 	if err != nil {
 		fmt.Printf("INSERT Error: %s\n", err)
 	}

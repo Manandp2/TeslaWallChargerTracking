@@ -97,14 +97,12 @@ func main() {
 		fmt.Printf("Error: %s\n", err)
 		return
 	}
-	fmt.Printf("Total Wh: %f\n", vitals.SessionEnergyWh)
 
 	price, err := getHourlyPrice()
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
 	}
-	fmt.Printf("PriceStr: %s\n", price.PriceStr)
 
 	UpdateTimeScaleDb(&vitals, &price)
 }
