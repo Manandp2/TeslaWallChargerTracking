@@ -34,9 +34,15 @@ func UpdateTimeScaleDb(vitals *Vitals, price *HourlyPrice) {
 		whInLastHour = vitals.SessionEnergyWh - prevWh
 	}
 	// Insert the new wh reading
-	insertQuery := `INSERT INTO charging_stats (time, total_wh, wh_difference, price, cost) VALUES ($1, $2, $3, $4, $5)`
-	_, err = conn.Exec(ctx, insertQuery, time.Now(), vitals.SessionEnergyWh, whInLastHour, price.Price, (whInLastHour/1000)*(price.Price/100))
+	insertQuery := `INSERT INTO comed_price (time, price) VALUES ($1, $2)`
+	_, err = conn.Exec(ctx, insertQuery, time.Now(), price.Price)
 	if err != nil {
-		fmt.Printf("INSERT Error: %s\n", err)
+		fmt.Printf("INSERT comed_price Error: %s\n", err)
+	}
+	// Insert the new wh reading
+	insertQuery = `INSERT INTO charging_history (time, total_wh, wh_difference) VALUES ($1, $2, $3)`
+	_, err = conn.Exec(ctx, insertQuery, time.Now(), vitals.SessionEnergyWh, whInLastHour)
+	if err != nil {
+		fmt.Printf("INSERT charging_history Error: %s\n", err)
 	}
 }
