@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type Vitals struct {
@@ -92,7 +91,7 @@ func getVitals() (Vitals, error) {
 }
 
 // Assume that this will be called at the end of each hour
-func work() {
+func main() {
 	vitals, err := getVitals()
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
@@ -106,29 +105,4 @@ func work() {
 	}
 
 	UpdateTimeScaleDb(&vitals, &price)
-}
-
-func main() {
-	for {
-		now := time.Now()
-		// Find next :57
-		next := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 57, 0, 0, now.Location())
-		if now.Minute() >= 57 {
-			next = next.Add(time.Hour)
-		}
-		wait := time.Until(next)
-		fmt.Printf("Waiting %v until next :57\n", wait)
-		time.Sleep(wait)
-
-		fmt.Println("Doing work at", time.Now())
-		work()
-
-		// Now repeat every hour
-		ticker := time.NewTicker(time.Hour)
-		for {
-			<-ticker.C
-			fmt.Println("Doing work at", time.Now())
-			work()
-		}
-	}
 }
