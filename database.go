@@ -22,7 +22,7 @@ func UpdateTimeScaleDb(vitals *Vitals, price *HourlyPrice) {
 
 	// Get the previous wh reading
 	var prevWh float64
-	err = conn.QueryRow(ctx, "SELECT total_wh FROM charging_stats ORDER BY time DESC LIMIT 1").Scan(&prevWh)
+	err = conn.QueryRow(ctx, "SELECT total_wh FROM charging_history ORDER BY time DESC LIMIT 1").Scan(&prevWh)
 	if err != nil {
 		fmt.Printf("SELECT Error: %s\n", err)
 		return
